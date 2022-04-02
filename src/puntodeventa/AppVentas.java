@@ -2,9 +2,12 @@ package puntodeventa;
 
 import java.util.Scanner;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 
 public class AppVentas {
-
+	
+	Scanner scanner;
+	//arraylist
 	private static ArrayList<Producto> productos = new ArrayList<Producto>();
 
 	// constantes
@@ -14,7 +17,9 @@ public class AppVentas {
 	public final static int OPCION_MENU_ELIMINAR = 3;
 	public final static int OPCION_MENU_PRODUCTOS = 2;
 	public final static int OPCION_MENU_CREAR = 1;
+	private static final Pagar[] pagar = null;
 
+	//main
 	public static void main(String[] args) {
 	int opcionSeleccionada;
 	do {
@@ -38,27 +43,23 @@ public class AppVentas {
 	}
 	} while( opcionSeleccionada != OPCION_MENU_SALIR );
 
-
-	// System.out.printf() -- String.format()
-	// %s = String, %d = número entero, %f = número c/ decimales
-	// %n = salto de línea
 	System.out.printf("Seleccionó la opción %d", opcionSeleccionada);
 	}
 
 	private static void crearProducto() {
-	Scanner scanner = new Scanner( System.in );
+	try (Scanner scanner = new Scanner( System.in )) {
+		System.out.println("Ingrese un código:");
+		String codigoProducto = scanner.nextLine();
 
-	System.out.println("Por favor ingrese un código para su producto:");
-	String codigoProducto = scanner.nextLine();
+		System.out.println("Ingrese un nombre:");
+		String nombreProducto = scanner.nextLine();
 
-	System.out.println("Por favor ingrese un nombre para su producto:");
-	String nombreProducto = scanner.nextLine();
+		System.out.println("Ingrese un precio:");
+		int precioProducto = scanner.nextInt();
 
-	System.out.println("Por favor ingrese un precio para su producto:");
-	int precioProducto = scanner.nextInt();
-
-	Producto productoNuevo = new Producto(codigoProducto, nombreProducto, precioProducto);
-	productos.add( productoNuevo );
+		Producto productoNuevo = new Producto(codigoProducto, nombreProducto, precioProducto);
+		productos.add( productoNuevo );
+	}
 	}
 
 	private static void verProductos() {
@@ -71,18 +72,80 @@ public class AppVentas {
 	}
 	}
 
+	private static Producto buscarProducto(String codigo) {
+		for (Producto p: productos) {
+			if (p.getCodigo().equalsIgnoreCase(codigo)) {
+				return p;
+			}
+		}
+		return null;
+	}
+	
 	private static void eliminarProducto() {
-	// productos.remove(0);
-
+		Scanner scanner = null;
+		scanner.nextLine();
+		System.out.println("Escriba el codigo del producto: ");
+		String codigo = scanner.nextLine();
+		System.out.println(codigo);
+		
+		Producto producto = buscarProducto(codigo);
+		if (producto != null) {
+			productos.remove(producto);
+			System.out.printf("Producto eliminado: %s %n%n", producto.getNombre());
+		}else {
+			System.out.printf("No existe el producto %n%n");
+		}
+		
 	}
 
 	private static void agregarProductoAlCarro() {
-	// TODO Auto-generated method stub
+		Pagar pago = new Pagar();
+		boolean seguirAgregandoProductos = true;
+		
+		do {
+		
+		verDetalleProductos();
+		scanner.nextLine(); 
+		System.out.println("Escriba el codigo del producto: ");
+		String codigo = scanner.nextLine();
 
+		Producto producto = buscarProducto(codigo);
+		
+		System.out.println(" ¿Cuantos productos quier comprar? ");
+		int cantidad = scanner.nextInt();
+		
+		
+		DetalleProductos detalleProductos  = new DetalleProductos (cantidad,producto);
+		pago.agregarDetalleProductos(detalleProductos);
+		
+		System.out.println("Quiere agregar mas productos al carro? (si/no)");
+		
+		seguirAgregandoProductos = scanner.next().equalsIgnoreCase("SI") ? true : false;
+		}while (seguirAgregandoProductos == true);
+		
+		pago.add(pago);
+		
+		
 	}
 
+	private static void verDetalleProductos() {
+					}
+
+
+static DateTimeFormatter fecha = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+
 	private static void pagar() {
-	// TODO Auto-generated method stub
+	
+			System.out.println("\n PAGAR");
+			System.out.println("==============");
+			
+			for (Pagar pago : pago) {			
+				System.out.printf(" Fecha: %s %n", fecha.format(pago.getFecha()));
+				System.out.println(pago.productosTotales());
+				System.out.printf(" Total: %s %n", pago.calcularTotal());
+				System.out.println("--------------------------------------------------");
+			}
+			System.out.println("\n\n");			
 
 	}
 
